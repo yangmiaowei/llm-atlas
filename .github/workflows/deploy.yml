@@ -1,0 +1,43 @@
+name: Deploy Blog
+
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+      - name: Deploy to ECS
+
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+
+          host: ${{ secrets.ECS_HOST }}
+
+          username: root
+
+          key: ${{ secrets.ECS_PRIVATE_KEY }}
+
+
+          script: |
+
+            cd /opt/blog/llm-atlas
+
+            git pull origin main
+
+
+            cd /opt/blog/quartz
+
+            npx quartz build
+
+
+            systemctl reload nginx
